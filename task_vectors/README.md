@@ -1,19 +1,18 @@
-第一步，参考readme把install dependecies
+# Step 1: Follow the README to install dependencies
 
 ```bash
+# Create the conda environment and activate it
 conda env create
 conda activate task-vectors
-```
 
-和add directory to pythonpath做完
-
-```bash
+# Add the directory to PYTHONPATH
 cd task_vectors
 export PYTHONPATH="$PYTHONPATH:$PWD"
 ```
 
-第二步，创建如下代码：merge.py，参考readme的最后部分：
-```
+# Step 2: Create the following `merge.py` script, referring to the final section of the README:
+
+```python
 import torch
 from task_vectors import TaskVector
 from eval import eval_single_dataset
@@ -33,69 +32,77 @@ task_vectors = [
     TaskVector(pretrained_checkpoint, f'checkpoints/{model}/{dataset}/finetuned.pt')
     for dataset in datasets
 ]
+
 # Sum the task vectors
 task_vector_sum = sum(task_vectors)
+
 # Apply the resulting task vector
 image_encoder = task_vector_sum.apply_to(pretrained_checkpoint, scaling_coef=0.8)
+
 # Evaluate
 for dataset in datasets:
     eval_single_dataset(image_encoder, dataset, args)
 ```
 
-第三步
-把上面的merge.py放在task_vectors下
-此时还没有加载数据集，可以先运行代码把其中import环节存在的路径拼写错误给改掉。
+# Step 3: Place `merge.py` in the `task_vectors` directory
 
-第四步
-在merge.py同路径下创建checkpoints文件夹
-把vit-l-14模型放入并解压
-(https://drive.google.com/drive/folders/1u_Tva6x0p6oxu5Eo0ZZsf-520Cc_3MKw?usp=share_link)
+At this stage, the datasets are not yet loaded. Run the code to fix any import-related path errors.
 
+# Step 4: Create a `checkpoints` folder in the same directory as `merge.py`
 
-第五步
-链接：https://pan.baidu.com/s/1ndScveTjqd0lE6At_uYNYw?pwd=7ji4 
-提取码：7ji4 
---来自百度网盘超级会员V3的分享
-解压我发的数据集在task-vectors/src下
-数据集我已经调整过了结构，理论上是可以直接使用的
+Download the ViT-L-14 model and extract it:
 
+[Download link](https://drive.google.com/drive/folders/1u_Tva6x0p6oxu5Eo0ZZsf-520Cc_3MKw?usp=share_link)
+
+# Step 5: Extract the provided dataset
+
+Download and extract the dataset in the `task-vectors/src` folder:
+
+[Dataset link](https://pan.baidu.com/s/1ndScveTjqd0lE6At_uYNYw?pwd=7ji4)
+
+Password: `7ji4`
+
+The dataset structure has been adjusted and should work directly.
 
 # Editing Models with Task Arithmetic
 
-This repository contains code for the ICLR 2023 paper [Editing Models with Task Arithmetic](https://arxiv.org/abs/2212.04089), by Gabriel Ilharco, Marco Tulio Ribeiro, Mitchell Wortsman, Suchin Gururangan, Ludwig Schmidt, Hannaneh Hajishirzi and Ali Farhadi.
+This repository contains code for the ICLR 2023 paper [Editing Models with Task Arithmetic](https://arxiv.org/abs/2212.04089), by Gabriel Ilharco, Marco Tulio Ribeiro, Mitchell Wortsman, Suchin Gururangan, Ludwig Schmidt, Hannaneh Hajishirzi, and Ali Farhadi.
 
 ### Abstract
-*Changing how pre-trained models behave---e.g., improving their performance on a downstream task or mitigating biases learned during pre-training---is a common practice when developing machine learning systems. In this work, we propose a new paradigm for steering the behavior of neural networks, centered around task vectors. A task vector specifies a direction in the weight space of a pre-trained model, such that movement in that direction improves performance on the task. We build task vectors by subtracting the weights of a pre-trained model from the weights of the same model after fine-tuning on a task. We show that these task vectors can be modified and combined together through arithmetic operations such as negation and addition, and the behavior of the resulting model is steered accordingly. Negating a task vector decreases performance on the target task, with little change in model behavior on control tasks. Moreover, adding task vectors together can improve performance on multiple tasks at once. Finally, when tasks are linked by an analogy relationship of the form ``A is to B as C is to D", combining task vectors from three of the tasks can improve performance on the fourth, even when no data from the fourth task is used for training. Overall, our experiments with several models, modalities and tasks show that task arithmetic is a simple, efficient and effective way of editing models.*
+*Changing how pre-trained models behave—e.g., improving their performance on a downstream task or mitigating biases learned during pre-training—is a common practice when developing machine learning systems. In this work, we propose a new paradigm for steering the behavior of neural networks, centered around task vectors. A task vector specifies a direction in the weight space of a pre-trained model, such that movement in that direction improves performance on the task. We build task vectors by subtracting the weights of a pre-trained model from the weights of the same model after fine-tuning on a task. We show that these task vectors can be modified and combined together through arithmetic operations such as negation and addition, and the behavior of the resulting model is steered accordingly. Negating a task vector decreases performance on the target task, with little change in model behavior on control tasks. Moreover, adding task vectors together can improve performance on multiple tasks at once. Finally, when tasks are linked by an analogy relationship of the form `A is to B as C is to D`, combining task vectors from three of the tasks can improve performance on the fourth, even when no data from the fourth task is used for training. Overall, our experiments with several models, modalities, and tasks show that task arithmetic is a simple, efficient, and effective way of editing models.*
 
-
-### Summary figure
+### Summary Figure
 
 <p align="center">
 <img src="img/task_vectors.png" alt="scatter" width="100%"/>
 </p>
 
-An illustration of task vectors and the arithmetic operations we study for editing models. (a) A task vector is obtained by subtracting the weights of a pre-trained model from the weights of the same model after fine-tuning. (b) Negating a task vector degrades performance on the task, without substantial changes in control tasks. (c) Adding task vectors together improves the performance of the pre-trained model on the tasks under consideration. (d) When tasks form an analogy relationship such as supervised and unsupervised learning on two different data sources, it is possible to improve performance on a supervised target task using only vectors from the remaining three combinations of objectives and datasets.
+An illustration of task vectors and the arithmetic operations we study for editing models:
+1. A task vector is obtained by subtracting the weights of a pre-trained model from the weights of the same model after fine-tuning.
+2. Negating a task vector degrades performance on the task, without substantial changes in control tasks.
+3. Adding task vectors together improves the performance of the pre-trained model on the tasks under consideration.
+4. When tasks form an analogy relationship such as supervised and unsupervised learning on two different data sources, it is possible to improve performance on a supervised target task using only vectors from the remaining three combinations of objectives and datasets.
 
 ## Code
 
-### Install dependencies
+### Install Dependencies
 
 ```bash
+# Create and activate the conda environment
 conda env create
 conda activate task-vectors
 ```
 
-
-### Add directory to PYTHONPATH:
+### Add Directory to PYTHONPATH
 
 ```bash
 cd task_vectors
 export PYTHONPATH="$PYTHONPATH:$PWD"
 ```
 
-### Using task vectors
+### Using Task Vectors
 
-The task vector logic can be found at [src/task_vectors.py](src/task_vectors.py).
+The task vector logic can be found at `src/task_vectors.py`.
 
 To create a task vector, you will need a pre-trained checkpoint and a fine-tuned checkpoint:
 
@@ -104,14 +111,14 @@ from task_vectors import TaskVector
 task_vector = TaskVector(pretrained_checkpoint, finetuned_checkpoint)
 ```
 
-Once created, task vectors can be modified and combined through arithmetic operations! For instance, to negate a task vector, simply use the ```-``` operator:
+Once created, task vectors can be modified and combined through arithmetic operations! For instance, to negate a task vector, simply use the `-` operator:
 
 ```python
 # Negating a task vector
 new_task_vector = -task_vector
 ```
 
-To add task vectors, you can use the ```+``` operator, or ```sum```:
+To add task vectors, you can use the `+` operator, or `sum`:
 
 ```python
 # Adding two task vectors
@@ -129,7 +136,7 @@ new_task_vector = task_vector_C + task_vector_B - task_vector_A
 
 ### Checkpoints
 
-Checkpoints for CLIP ViT-B/32, ViT-B/16 and ViT-L/14 are available on he link below, including fine-tuned checkpoints on eight downstream tasks: Stanford Cars, DTD, EuroSAT, GTSRB, MNIST, RESISC45, SUN397 and SVHN.
+Checkpoints for CLIP ViT-B/32, ViT-B/16, and ViT-L/14 are available, including fine-tuned checkpoints on eight downstream tasks: Stanford Cars, DTD, EuroSAT, GTSRB, MNIST, RESISC45, SUN397, and SVHN.
 
 [Download here](https://drive.google.com/drive/folders/1u_Tva6x0p6oxu5Eo0ZZsf-520Cc_3MKw?usp=share_link)
 
@@ -153,7 +160,6 @@ args.save = f'checkpoints/{model}'
 pretrained_checkpoint = f'checkpoints/{model}/zeroshot.pt'
 finetuned_checkpoint = f'checkpoints/{model}/{dataset}/finetuned.pt'
 
-
 # Create the task vector
 task_vector = TaskVector(pretrained_checkpoint, finetuned_checkpoint)
 # Negate the task vector
@@ -166,7 +172,6 @@ eval_single_dataset(image_encoder, 'ImageNet', args)
 ```
 
 You can also find an example of adding task vectors together below, using the MNIST and RESISC45 datasets:
-
 
 ```python
 import torch
@@ -196,3 +201,4 @@ image_encoder = task_vector_sum.apply_to(pretrained_checkpoint, scaling_coef=0.8
 for dataset in datasets:
     eval_single_dataset(image_encoder, dataset, args)
 ```
+
